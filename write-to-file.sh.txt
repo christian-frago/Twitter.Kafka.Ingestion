@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Set the filenames for the Python scripts
+PRODUCER_SCRIPT="producer-twitter.py"
+CLEAN_SCRIPT="cleantweets.py"
+
+# Set the time delay variables in seconds
+PRODUCER_DELAY=300 # 5 minutes
+CLEAN_DELAY=60 # 1 minute
+
+# Set the log file name
+LOGFILE="logfile.log"
+
+# Remove any existing log file
+if [ -f "$LOGFILE" ]; then
+    rm "$LOGFILE"
+fi
+
+# Start an infinite loop
+while true; do
+    # Run the producer script and redirect output to the log file
+    echo "Running producer script at $(date)" >> "$LOGFILE"
+    echo "Running producer script at $(date)"
+    python "$PRODUCER_SCRIPT" >> "$LOGFILE" 2>&1
+    echo "Producer script completed at $(date)" >> "$LOGFILE"
+    echo "Producer script completed at $(date)"
+    
+    # Wait for the specified delay before running the clean script
+    echo "Sleeping for $CLEAN_DELAY seconds before running clean script..." >> "$LOGFILE"
+    echo "Sleeping for $CLEAN_DELAY seconds before running clean script..."
+    sleep "$CLEAN_DELAY"
+    
+    # Run the clean script and redirect output to the log file
+    echo "Running clean script at $(date)" >> "$LOGFILE"
+    echo "Running clean script at $(date)"
+    python "$CLEAN_SCRIPT" >> "$LOGFILE" 2>&1
+    echo "Clean script completed at $(date)" >> "$LOGFILE"
+    echo "Clean script completed at $(date)"
+    
+    #Copy the tweets to HDFS BigData/hive
+    hadoop fs -copyFromLocal clean_consumer.csv /BigData/hive/.
+    echo "Copied to BigData/hive" >> "$LOGFILE"
+    echo "Copied to BigData/hive"
+
+    # Wait for the specified delay before running the producer script again
+    echo "Sleeping for $PRODUCER_DELAY seconds before running producer script again..." >> "$LOGFILE"
+    echo "Sleeping for $PRODUCER_DELAY seconds before running producer script again..."
+    sleep "$PRODUCER_DELAY"
+done

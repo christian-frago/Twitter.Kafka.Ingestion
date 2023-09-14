@@ -1,0 +1,16 @@
+with open("consumer.log", "r") as infile, open("clean_consumer.csv", "w") as outfile:
+    # Define the header
+    header = "Date,Type,User,Tweet,Keywords,Likes,Retweets,Hashtags,Mentions"
+    
+    # Write the header to the output file
+    outfile.write(header + "\n")
+    
+    # Skip the first 11 lines
+    for _ in range(11):
+        next(infile)
+        
+    # Write the cleaned lines to the output file
+    for line in infile:
+        # Remove quotation marks from the beginning and end of each line
+        line = line.strip()[1:-1]
+        outfile.write(line + "\n")

@@ -1,0 +1,33 @@
+'''
+**NOTE***
+The topic must already exist.  The creation of topics is usually done using the Kafka command line tools. 
+For example, you can use the kafka-topics.sh script that comes with a Kafka distribution to create 
+a topic. Once the topic is created, the producer can send messages to it.
+'''
+import os
+import logging
+from kafka.consumer import KafkaConsumer
+
+# Kafka consumer configuration
+topic = "playoffs"
+brokers = "localhost:9092"
+
+# Delete the existing log file if it exists
+if os.path.exists('consumer.log'):
+    os.remove('consumer.log')
+
+# Configure logging
+logging.root.setLevel(logging.WARNING)
+logging.basicConfig(filename='consumer.log', level=logging.INFO, format='%(message)s')
+
+# Create the Kafka consumer
+consumer = KafkaConsumer(topic, bootstrap_servers=brokers)
+
+# Continuously poll for new messages
+for message in consumer:
+    # Decode the message value and print it to the console
+    message_value = message.value.decode()
+    print(message_value)
+    
+    # Write the message value to the log file
+    logging.info(message_value)
